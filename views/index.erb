@@ -7,13 +7,19 @@
 <div class="top"> 
 <h1> </h1> 
 </div>
-
-	<p><%= @hide_word.join(" ") %></p>
+	
+	<h1><%= @hide_word.join(" ") %></h1>
+	<p>Turns left: <%=@turns_left%></p>
+	<p>Used Letters: [<%= @used_letters.join(" ") %>]</p>
+	<p><%= @msg%></p>
 
 <form action='/play' method="POST">
     <label for="letter">Enter a letter:</label>
     <input name="letter" maxlength="1" size="2" autofocus />
     <input type="submit" value="Guess"/>
+  </form>
+  <form method="get" action="/">
+    <input type="submit" value="Play Again!"/>
   </form>
 </body>
 </html>
