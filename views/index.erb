@@ -7,11 +7,13 @@
 <div class="top"> 
 <h1> </h1> 
 </div>
- 
-<p><%=@the_word%></p>
-<form>
-<input type ='text' name='letter'/>
-<input type ='submit' value='Guess'/>
-</form>
+
+	<p><%= @hide_word.join(" ") %></p>
+
+<form action='/play' method="POST">
+    <label for="letter">Enter a letter:</label>
+    <input name="letter" maxlength="1" size="2" autofocus />
+    <input type="submit" value="Guess"/>
+  </form>
 </body>
 </html>

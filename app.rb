@@ -1,37 +1,90 @@
 require 'sinatra'
 require 'sinatra/reloader' if development?
 
-
 enable :sessions
 
+  get '/' do
+  	start_game
+  	@the_word = session[:the_word]
+  	@hide_word = session[:hide_word]
+  	redirect '/play'
+  end
 
-get '/' do
-start_game
-session[:hide_word] = secret_word		
-erb :index
-end
+  get '/play' do
+  	@the_word = session[:the_word]
+  	@hide_word = session[:hide_word]
+  	erb :index
+  end
 
-
+  post '/play' do 
+  	@the_word = session[:the_word]
+  	@hide_word = session[:hide_word]
+  	correct_letter?(params['letter'])
+  	erb :index
+  end 
 
 helpers do
 
-	def start_game
-		@used_letters = []
-		@turns_left = 0
-		@the_word = generate_word
-		@hide_word = session[:hide_word]	
+  def start_game 
+		#@used_letters = []
+		#@turns_left = 0
+		session[:the_word] = generate_word
+		session[:hide_word] = secret_word		
 	end 
+
+	def play_game
+		loop do
+			system 'clear' 
+			message
+			puts "chances left: #{8 - @turns_left}"
+			puts "Used letters: #{@used_letters}"
+			guess = enter_guess 
+
+
+			if @the_word.include?(guess)
+			  correct_letter?(guess)
+			else 
+				@turns_left += 1  
+			
+			end
+
+			if win?  
+				outcome = "won"
+				outcome_screen(outcome)
+				break
+
+
+			elsif @turns_left >= 8 
+				outcome = "lost"
+				outcome_screen(outcome)
+				break		
+			end 
+			
+		end 	  
+	end
 
 	def win? 
 		if @hide_word == @the_word 
 			return true 
 		end 
-	end 		
+	end 	
 
-	def message
-		puts "Word: #{@hide_word.join()}"
-		puts "\n"
-	end
+	def outcome_screen(outcome)
+		system 'clear'
+		puts "You have #{outcome}"
+		puts "The word is #{@the_word.join()}"
+		3.times do 
+			print "Restarting the Game..."
+			sleep(6)
+			@used_letters = []
+			@turns_left = 0 
+			@the_word = generate_word 
+			@hide_word = secret_word 
+			play_game
+		end 
+
+	end 	
+
 
 	def generate_word
 		words = File.read('5desk.txt')
@@ -48,7 +101,7 @@ helpers do
 	end 
 
 	def secret_word
-		@hide_word = Array.new(@the_word.size,"_")
+		session[:hide_word] = Array.new(session[:the_word].size,"_")
 	end 
 
 	def correct_letter?(letter) 
@@ -70,4 +123,4 @@ helpers do
 			end 
 		end 
 	end  
-end 
+end
